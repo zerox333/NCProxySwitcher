@@ -45,6 +45,7 @@
 		UIImage *bg = [[UIImage imageWithContentsOfFile:@"/System/Library/WeeAppPlugins/NCProxySwitcher.bundle/WeeAppBackground.png"] stretchableImageWithLeftCapWidth:5 topCapHeight:70];
 		UIImageView *bgView = [[UIImageView alloc] initWithImage:bg];
 		bgView.frame = CGRectMake(0, 0, 316, 35);
+        bgView.tag = 999;
 		[_view addSubview:bgView];
 		[bgView release];
         
@@ -84,6 +85,41 @@
 - (float)viewHeight
 {
 	return 35.0f;
+}
+
+- (void)willRotateToInterfaceOrientation:(int)interfaceOrientation
+{
+    NSLog(@"orientation: ======= %d", interfaceOrientation);
+    if (interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+    {
+        NSLog(@"Landscape====================");
+        _view.frame = CGRectMake(2, 0, 476, 35);
+        UIImageView *bgView = (UIImageView *)[self.view viewWithTag:999];
+        bgView.frame = CGRectMake(0, 0, 476, 35);
+        for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
+        {
+            @autoreleasepool
+            {
+                UIButton *btn = (UIButton *)[self.view viewWithTag:btnTag];
+                btn.frame = CGRectMake((btnTag - kDirectPacTag) * 155, 0, 155, 35);
+            }
+        }
+    }
+    else
+    {
+        NSLog(@"Portrait====================");
+        _view.frame = CGRectMake(2, 0, 316, 35);
+        UIImageView *bgView = (UIImageView *)[self.view viewWithTag:999];
+        bgView.frame = CGRectMake(0, 0, 316, 35);
+        for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
+        {
+            @autoreleasepool
+            {
+                UIButton *btn = (UIButton *)[self.view viewWithTag:btnTag];
+                btn.frame = CGRectMake((btnTag - kDirectPacTag) * 105, 0, 105, 35);
+            }
+        }
+    }
 }
 
 - (void)initButtonStatus
@@ -149,28 +185,31 @@
     
     for (int tag = kDirectPacTag; tag <= kProxyAllPacTag; tag++)
     {
-        if (tag != btnTag)
+        @autoreleasepool
         {
-            NSString *origMessage = nil;
-            switch (tag)
+            if (tag != btnTag)
             {
-                case kDirectPacTag:
-                    origMessage = @"Direct";
-                    break;
-                case kProxyAutoPacTag:
-                    origMessage = @"ProxyAuto";
-                    break;
-                case kProxyAllPacTag:
-                    origMessage = @"ProxyAll";
-                    break;
-                    
-                default:
-                    origMessage = @"";
-                    break;
+                NSString *origMessage = nil;
+                switch (tag)
+                {
+                    case kDirectPacTag:
+                        origMessage = @"Direct";
+                        break;
+                    case kProxyAutoPacTag:
+                        origMessage = @"ProxyAuto";
+                        break;
+                    case kProxyAllPacTag:
+                        origMessage = @"ProxyAll";
+                        break;
+                        
+                    default:
+                        origMessage = @"";
+                        break;
+                }
+                UIButton *btn = (UIButton *)[self.view viewWithTag:tag];
+                [btn setTitle:origMessage forState:UIControlStateNormal];
+                btn.titleLabel.font = [UIFont systemFontOfSize:16];
             }
-            UIButton *btn = (UIButton *)[self.view viewWithTag:tag];
-            [btn setTitle:origMessage forState:UIControlStateNormal];
-            btn.titleLabel.font = [UIFont systemFontOfSize:16];
         }
     }
 }

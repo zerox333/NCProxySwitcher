@@ -340,6 +340,7 @@
 				DFF21F6B165F423100E1C91B /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
