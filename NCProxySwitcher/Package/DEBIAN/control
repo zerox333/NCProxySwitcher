@@ -1,0 +1,17 @@
+Package: com.hoperun.NCProxySwitcher
+Name: NCProxySwitcher
+Version: 1.0-1
+Description: 
+Section: Addons (NotificationCenter)
+Depends: firmware (>= 5.0)
+Conflicts: 
+Replaces: 
+Priority: optional
+Architecture: iphoneos-arm
+Author: ding_yuanyi
+dev: 
+Homepage: 
+Depiction: 
+Maintainer: 
+Icon: 
+
