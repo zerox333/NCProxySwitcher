@@ -20,23 +20,29 @@
         textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, 0)];
         textView.delegate = self;
         textView.alpha = 0;
-        textView.editable = NO;
         textView.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
         textView.textColor = [UIColor whiteColor];
         
         textView.layer.cornerRadius = 5;
         textView.layer.masksToBounds = YES;
-        textView.layer.shadowOffset = CGSizeMake(5, 3);
-        textView.layer.shadowOpacity = 0.6;
-        textView.layer.shadowRadius = 5;
-        textView.layer.shadowColor = [UIColor blackColor].CGColor;
+//        textView.layer.shadowOffset = CGSizeMake(5, 3);
+//        textView.layer.shadowOpacity = 0.6;
+//        textView.layer.shadowRadius = 5;
+//        textView.layer.shadowColor = [UIColor blackColor].CGColor;
   
         [self addSubview:textView];
         
         [UIView animateWithDuration:0.3f animations:^{
             textView.alpha = 1;
-            textView.frame = self.bounds;
+            textView.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height - 35);
         }];
+        
+        UIButton *closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        closeBtn.frame = CGRectMake(0, self.bounds.size.height - 35, 320, 35);
+        closeBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+        [closeBtn setTitle:@"Close" forState:UIControlStateNormal];
+        [closeBtn addTarget:self action:@selector(tap:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:closeBtn];
     }
     return self;
 }
@@ -47,12 +53,7 @@
     [super dealloc];
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [delegate pacViewerTapped:self];
-}
-
-- (void)tap:(UITapGestureRecognizer *)gesture
+- (void)tap:(UIButton *)sender
 {
     [delegate pacViewerTapped:self];
 }

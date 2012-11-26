@@ -8,6 +8,7 @@
 
 #import "NCProxySwitcherController.h"
 #import <SBBulletinTableView.h>
+#import <SBBulletinWindow.h>
 
 #define kDirectPacTag       1001
 #define kProxyAutoPacTag    1002
@@ -63,7 +64,6 @@
         [switchBtnDirect addGestureRecognizer:directLongPress];
         [directLongPress release];
         [_view addSubview:switchBtnDirect];
-        [switchBtnDirect release];
         
         UIButton *switchBtnProxyIgnorelocal = [UIButton buttonWithType:UIButtonTypeCustom];
         switchBtnProxyIgnorelocal.frame = CGRectMake(105, 0, 100, 35);
@@ -77,7 +77,6 @@
         [switchBtnProxyIgnorelocal addGestureRecognizer:proxyAutoLongPress];
         [proxyAutoLongPress release];
         [_view addSubview:switchBtnProxyIgnorelocal];
-        [switchBtnProxyIgnorelocal release];
         
         UIButton *switchBtnProxyAll = [UIButton buttonWithType:UIButtonTypeCustom];
         switchBtnProxyAll.frame = CGRectMake(210, 0, 100, 35);
@@ -91,7 +90,6 @@
         [switchBtnProxyAll addGestureRecognizer:proxyAllLongPress];
         [proxyAllLongPress release];
         [_view addSubview:switchBtnProxyAll];
-        [switchBtnProxyAll release];
         
         [self initButtonStatus];
 	}
@@ -298,15 +296,21 @@
         
         SBBulletinTableView *NCTableView = (SBBulletinTableView *)_view.superview.superview.superview;
         
+        NSLog(@"NCTableView.superview : %@", _view.superview.superview.superview.superview);
+        NSLog(@"NCTableView.superview.superview : %@", _view.superview.superview.superview.superview.superview);
+        NSLog(@"NCTableView.superview.superview.superview : %@", _view.superview.superview.superview.superview.superview.superview);
+        
         CGFloat origY = [_view convertPoint:CGPointMake(0, 35) toView:(UIView *)NCTableView].y;
         CGFloat height = 440 - origY;
 
         NSError *error = nil;
         NSString *pacStr = [NSString stringWithContentsOfFile:pacPath encoding:NSUTF8StringEncoding error:&error];
-        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(2, origY, 316, height)];
+        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(0, 20, 320, 244)];
         viewer.delegate = self;
         viewer.textView.text = pacStr;
-        [(UIView *)NCTableView addSubview:viewer];
+//        [(UIView *)NCTableView addSubview:viewer];
+        UIWindow *rootWindow = (UIWindow *)_view.superview.superview.superview.superview.superview.superview;
+        [rootWindow addSubview:viewer];
 
         [viewer release];
     }
