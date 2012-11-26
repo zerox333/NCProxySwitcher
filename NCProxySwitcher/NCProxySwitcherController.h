@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "SpringBoard/BBWeeAppController.h"
+#import "PacViewer.h"
 
 typedef enum{
 	PAC_DIRECT,//直接连接
@@ -16,10 +17,12 @@ typedef enum{
     PAC_PROXY_ALL//代理连接
 }PAC_TYPE;
 
-@interface NCProxySwitcherController : NSObject <BBWeeAppController>
+@interface NCProxySwitcherController : NSObject <BBWeeAppController, PacViewerDelegate>
 {
     UIView *_view;
     NSArray *pacArray;
+    BOOL isContentShowing;
+    PacViewer *viewer;
 }
 
 @property(nonatomic, retain) NSArray *pacArray;

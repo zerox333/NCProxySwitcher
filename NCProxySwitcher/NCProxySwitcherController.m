@@ -7,6 +7,7 @@
 //
 
 #import "NCProxySwitcherController.h"
+#import <SBBulletinTableView.h>
 
 #define kDirectPacTag       1001
 #define kProxyAutoPacTag    1002
@@ -25,6 +26,7 @@
 	if ((self = [super init]))
 	{
         self.pacArray = [NSArray arrayWithObjects:kDirectPacPath, kProxyAutoPacPath, kProxyAllPacPath, nil];
+        isContentShowing = NO;
 	}
     
 	return self;
@@ -54,7 +56,12 @@
         switchBtnDirect.tag = kDirectPacTag;
         switchBtnDirect.titleLabel.font = [UIFont systemFontOfSize:16];
         [switchBtnDirect setTitle:@"Direct" forState:UIControlStateNormal];
+        [switchBtnDirect setTitle:@"Close" forState:UIControlStateSelected];
         [switchBtnDirect addTarget:self action:@selector(switchProxy:) forControlEvents:UIControlEventTouchUpInside];
+        UILongPressGestureRecognizer *directLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
+        directLongPress.minimumPressDuration = 0.5f;
+        [switchBtnDirect addGestureRecognizer:directLongPress];
+        [directLongPress release];
         [_view addSubview:switchBtnDirect];
         [switchBtnDirect release];
         
@@ -63,7 +70,12 @@
         switchBtnProxyIgnorelocal.tag = kProxyAutoPacTag;
         switchBtnProxyIgnorelocal.titleLabel.font = [UIFont systemFontOfSize:16];
         [switchBtnProxyIgnorelocal setTitle:@"ProxyAuto" forState:UIControlStateNormal];
+        [switchBtnProxyIgnorelocal setTitle:@"Close" forState:UIControlStateSelected];
         [switchBtnProxyIgnorelocal addTarget:self action:@selector(switchProxy:) forControlEvents:UIControlEventTouchUpInside];
+        UILongPressGestureRecognizer *proxyAutoLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
+        proxyAutoLongPress.minimumPressDuration = 0.5f;
+        [switchBtnProxyIgnorelocal addGestureRecognizer:proxyAutoLongPress];
+        [proxyAutoLongPress release];
         [_view addSubview:switchBtnProxyIgnorelocal];
         [switchBtnProxyIgnorelocal release];
         
@@ -72,7 +84,12 @@
         switchBtnProxyAll.tag = kProxyAllPacTag;
         switchBtnProxyAll.titleLabel.font = [UIFont systemFontOfSize:16];
         [switchBtnProxyAll setTitle:@"ProxyAll" forState:UIControlStateNormal];
+        [switchBtnProxyAll setTitle:@"Close" forState:UIControlStateSelected];
         [switchBtnProxyAll addTarget:self action:@selector(switchProxy:) forControlEvents:UIControlEventTouchUpInside];
+        UILongPressGestureRecognizer *proxyAllLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
+        proxyAllLongPress.minimumPressDuration = 0.5f;
+        [switchBtnProxyAll addGestureRecognizer:proxyAllLongPress];
+        [proxyAllLongPress release];
         [_view addSubview:switchBtnProxyAll];
         [switchBtnProxyAll release];
         
@@ -122,6 +139,14 @@
     }
 }
 
+- (void)viewDidDisappear
+{
+    if (isContentShowing)
+    {
+        [self pacViewerTapped:viewer];
+    }
+}
+
 - (void)initButtonStatus
 {
     PAC_TYPE pacType = [self currentPacType];
@@ -134,6 +159,12 @@
 
 - (void)switchProxy:(UIButton *)sender
 {
+    if (isContentShowing)
+    {
+        [self pacViewerTapped:viewer];
+        return;
+    }
+    
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *pacToSwitchTo = [pacArray objectAtIndex:(sender.tag - kDirectPacTag)];
     NSError *error = nil;
@@ -239,5 +270,74 @@
     return pacType;
 }
 
+- (void)longPress:(UILongPressGestureRecognizer *)gesture
+{
+    if (!isContentShowing)
+    {
+        isContentShowing = YES;
+        
+        UIButton *button = (UIButton *)gesture.view;
+        button.selected = YES;
+        
+        NSString *pacPath = nil;
+        switch (button.tag)
+        {
+            case kDirectPacTag:
+                pacPath = kDirectPacPath;
+                break;
+            case kProxyAutoPacTag:
+                pacPath = kProxyAutoPacPath;
+                break;
+            case kProxyAllPacTag:
+                pacPath = kProxyAllPacPath;
+                break;
+                
+            default:
+                break;
+        }
+        
+        SBBulletinTableView *NCTableView = (SBBulletinTableView *)_view.superview.superview.superview;
+        
+        CGFloat origY = [_view convertPoint:CGPointMake(0, 35) toView:(UIView *)NCTableView].y;
+        CGFloat height = 440 - origY;
+
+        NSError *error = nil;
+        NSString *pacStr = [NSString stringWithContentsOfFile:pacPath encoding:NSUTF8StringEncoding error:&error];
+        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(2, origY, 316, height)];
+        viewer.delegate = self;
+        viewer.textView.text = pacStr;
+        [(UIView *)NCTableView addSubview:viewer];
+
+        [viewer release];
+    }
+}
+
+- (void)pacViewerTapped:(PacViewer *)pacViewer
+{
+    [UIView animateWithDuration:0.3f animations:^{
+        pacViewer.textView.alpha = 0;
+        pacViewer.textView.frame = CGRectMake(2, 0, 316, 0);
+    } completion:^(BOOL finished){
+        if (finished)
+        {
+            [pacViewer removeFromSuperview];
+        }
+    }];
+    
+    for (int tag = kDirectPacTag; tag <= kProxyAllPacTag; tag++)
+    {
+        @autoreleasepool
+        {
+            UIButton *btn = (UIButton *)[self.view viewWithTag:tag];
+            if (btn.selected)
+            {
+                btn.selected = NO;
+                break;
+            }
+        }
+    }
+    
+    isContentShowing = NO;
+}
 
 @end

@@ -7,12 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF2A0B1716633B280010109F /* PacViewer.h in Headers */ = {isa = PBXBuildFile; fileRef = DF2A0B1516633B280010109F /* PacViewer.h */; };
+		DF2A0B1816633B280010109F /* PacViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = DF2A0B1616633B280010109F /* PacViewer.m */; };
 		DFF21F51165F423100E1C91B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFF21F50165F423100E1C91B /* Foundation.framework */; };
 		DFF21F53165F423100E1C91B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFF21F52165F423100E1C91B /* UIKit.framework */; };
 		DFF21F5E165F423100E1C91B /* NCProxySwitcherController.m in Sources */ = {isa = PBXBuildFile; fileRef = DFF21F5D165F423100E1C91B /* NCProxySwitcherController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DF2A0B1516633B280010109F /* PacViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacViewer.h; sourceTree = "<group>"; };
+		DF2A0B1616633B280010109F /* PacViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PacViewer.m; sourceTree = "<group>"; };
 		DFF21F4D165F423100E1C91B /* NCProxySwitcher */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = NCProxySwitcher; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFF21F50165F423100E1C91B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		DFF21F52165F423100E1C91B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -71,6 +75,8 @@
 		DFF21F54165F423100E1C91B /* NCProxySwitcher */ = {
 			isa = PBXGroup;
 			children = (
+				DF2A0B1516633B280010109F /* PacViewer.h */,
+				DF2A0B1616633B280010109F /* PacViewer.m */,
 				DFF21F5C165F423100E1C91B /* NCProxySwitcherController.h */,
 				DFF21F5D165F423100E1C91B /* NCProxySwitcherController.m */,
 				DFF21F55165F423100E1C91B /* Package */,
@@ -149,6 +155,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF2A0B1716633B280010109F /* PacViewer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,6 +227,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFF21F5E165F423100E1C91B /* NCProxySwitcherController.m in Sources */,
+				DF2A0B1816633B280010109F /* PacViewer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
