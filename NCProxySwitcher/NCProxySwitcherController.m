@@ -43,6 +43,8 @@
 {
 	if (_view == nil)
 	{
+        
+        NSLog(@"init view ===========");
 		_view = [[UIView alloc] initWithFrame:CGRectMake(2, 0, 316, 35)];
         
 		UIImage *bg = [[UIImage imageWithContentsOfFile:@"/System/Library/WeeAppPlugins/NCProxySwitcher.bundle/WeeAppBackground.png"] stretchableImageWithLeftCapWidth:5 topCapHeight:70];
@@ -99,6 +101,10 @@
 
 - (float)viewHeight
 {
+    if (_view)
+    {
+        return _view.frame.size.height;
+    }
 	return 35.0f;
 }
 
@@ -294,7 +300,7 @@
                 break;
         }
         
-        SBBulletinTableView *NCTableView = (SBBulletinTableView *)_view.superview.superview.superview;
+        UITableView *NCTableView = (UITableView *)_view.superview.superview.superview;
         
         NSLog(@"NCTableView.superview : %@", _view.superview.superview.superview.superview);
         NSLog(@"NCTableView.superview.superview : %@", _view.superview.superview.superview.superview.superview);
@@ -311,7 +317,7 @@
 //        [(UIView *)NCTableView addSubview:viewer];
         UIWindow *rootWindow = (UIWindow *)_view.superview.superview.superview.superview.superview.superview;
         [rootWindow addSubview:viewer];
-
+        
         [viewer release];
     }
 }
