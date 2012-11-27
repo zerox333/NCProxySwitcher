@@ -123,7 +123,7 @@
 {
     self.userInteractionEnabled = NO;
     [UIView animateWithDuration:0.3f animations:^{
-        self.frame = CGRectMake(0, 0, 320, 244);
+        self.frame = CGRectMake(0, 20, 320, 244);
         self.textView.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height - 35);
         bgView.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height - 35);
         closeBtn.frame = CGRectMake(0, self.bounds.size.height - 35, 320, 35);

@@ -317,9 +317,9 @@
         NSLog(@"NCTableView.superview.superview : %@", _view.superview.superview.superview.superview.superview);
         NSLog(@"rootWindow : %@", _view.superview.superview.superview.superview.superview.superview);
         
-//        UIWindow *rootWindow = (UIWindow *)_view.superview.superview.superview.superview.superview.superview;
-        CGFloat origY = [_view convertPoint:CGPointMake(0, 44) toView:(UIView *)NCTableView].y;
-        CGFloat height = 430 - origY;
+        UIWindow *NCView = (UIWindow *)_view.superview.superview.superview.superview;
+        CGFloat origY = [_view convertPoint:CGPointMake(0, 44) toView:(UIView *)NCView].y;
+        CGFloat height = 450 - origY;
 
         NSError *error = nil;
         NSString *pacStr = [NSString stringWithContentsOfFile:pacPath encoding:NSUTF8StringEncoding error:&error];
@@ -327,7 +327,8 @@
         viewer.delegate = self;
         viewer.textView.text = pacStr;
 
-        [NCTableView addSubview:viewer];
+        [NCView addSubview:viewer];
+        [NCView bringSubviewToFront:viewer];
         
         [viewer release];
     }
