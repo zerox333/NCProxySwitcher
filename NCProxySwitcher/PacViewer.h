@@ -14,17 +14,23 @@
 
 @optional
 
-- (void)pacViewerTapped:(PacViewer *)pacViewer;
+- (void)pacViewerWillDismiss;
 
 @end
 
 @interface PacViewer : UIView <UITextViewDelegate>
 {
+    UIView *bgView;
     UITextView *textView;
+    UIButton *closeBtn;
     id<PacViewerDelegate> delegate;
 }
 
+@property(nonatomic, retain) UIView *bgView;
 @property(nonatomic, retain) UITextView *textView;
+@property(nonatomic, retain) UIButton *closeBtn;
 @property(nonatomic, assign) id<PacViewerDelegate> delegate;
+
+- (void)dismissAnimated:(BOOL)animated;
 
 @end

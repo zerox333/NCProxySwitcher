@@ -8,7 +8,6 @@
 
 #import "NCProxySwitcherController.h"
 #import <SBBulletinTableView.h>
-#import <SBBulletinWindow.h>
 
 #define kDirectPacTag       1001
 #define kProxyAutoPacTag    1002
@@ -35,6 +34,7 @@
 
 - (void)dealloc
 {
+    NSLog(@"Dealloc==============");
 	[_view release];
 	[super dealloc];
 }
@@ -45,17 +45,17 @@
 	{
         
         NSLog(@"init view ===========");
-		_view = [[UIView alloc] initWithFrame:CGRectMake(2, 0, 316, 35)];
+		_view = [[UIView alloc] initWithFrame:CGRectMake(2, 0, 316, 44)];
         
 		UIImage *bg = [[UIImage imageWithContentsOfFile:@"/System/Library/WeeAppPlugins/NCProxySwitcher.bundle/WeeAppBackground.png"] stretchableImageWithLeftCapWidth:5 topCapHeight:70];
 		UIImageView *bgView = [[UIImageView alloc] initWithImage:bg];
-		bgView.frame = CGRectMake(0, 0, 316, 35);
+		bgView.frame = CGRectMake(0, 0, 316, 44);
         bgView.tag = 999;
 		[_view addSubview:bgView];
 		[bgView release];
         
         UIButton *switchBtnDirect = [UIButton buttonWithType:UIButtonTypeCustom];
-        switchBtnDirect.frame = CGRectMake(0, 0, 100, 35);
+        switchBtnDirect.frame = CGRectMake(0, 0, 100, 44);
         switchBtnDirect.tag = kDirectPacTag;
         switchBtnDirect.titleLabel.font = [UIFont systemFontOfSize:16];
         [switchBtnDirect setTitle:@"Direct" forState:UIControlStateNormal];
@@ -68,7 +68,7 @@
         [_view addSubview:switchBtnDirect];
         
         UIButton *switchBtnProxyIgnorelocal = [UIButton buttonWithType:UIButtonTypeCustom];
-        switchBtnProxyIgnorelocal.frame = CGRectMake(105, 0, 100, 35);
+        switchBtnProxyIgnorelocal.frame = CGRectMake(105, 0, 100, 44);
         switchBtnProxyIgnorelocal.tag = kProxyAutoPacTag;
         switchBtnProxyIgnorelocal.titleLabel.font = [UIFont systemFontOfSize:16];
         [switchBtnProxyIgnorelocal setTitle:@"ProxyAuto" forState:UIControlStateNormal];
@@ -81,7 +81,7 @@
         [_view addSubview:switchBtnProxyIgnorelocal];
         
         UIButton *switchBtnProxyAll = [UIButton buttonWithType:UIButtonTypeCustom];
-        switchBtnProxyAll.frame = CGRectMake(210, 0, 100, 35);
+        switchBtnProxyAll.frame = CGRectMake(210, 0, 100, 44);
         switchBtnProxyAll.tag = kProxyAllPacTag;
         switchBtnProxyAll.titleLabel.font = [UIFont systemFontOfSize:16];
         [switchBtnProxyAll setTitle:@"ProxyAll" forState:UIControlStateNormal];
@@ -105,7 +105,7 @@
     {
         return _view.frame.size.height;
     }
-	return 35.0f;
+	return 44.0f;
 }
 
 - (void)willRotateToInterfaceOrientation:(int)interfaceOrientation
@@ -115,13 +115,13 @@
     {
         NSLog(@"Landscape====================");
         _view.frame = CGRectMake(2, 0, 476, 35);
-        UIImageView *bgView = (UIImageView *)[self.view viewWithTag:999];
+        UIImageView *bgView = (UIImageView *)[_view viewWithTag:999];
         bgView.frame = CGRectMake(0, 0, 476, 35);
         for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
         {
             @autoreleasepool
             {
-                UIButton *btn = (UIButton *)[self.view viewWithTag:btnTag];
+                UIButton *btn = (UIButton *)[_view viewWithTag:btnTag];
                 btn.frame = CGRectMake((btnTag - kDirectPacTag) * 155, 0, 155, 35);
             }
         }
@@ -129,26 +129,24 @@
     else
     {
         NSLog(@"Portrait====================");
-        _view.frame = CGRectMake(2, 0, 316, 35);
-        UIImageView *bgView = (UIImageView *)[self.view viewWithTag:999];
-        bgView.frame = CGRectMake(0, 0, 316, 35);
+        _view.frame = CGRectMake(2, 0, 316, 44);
+        UIImageView *bgView = (UIImageView *)[_view viewWithTag:999];
+        bgView.frame = CGRectMake(0, 0, 316, 44);
         for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
         {
             @autoreleasepool
             {
-                UIButton *btn = (UIButton *)[self.view viewWithTag:btnTag];
-                btn.frame = CGRectMake((btnTag - kDirectPacTag) * 105, 0, 105, 35);
+                UIButton *btn = (UIButton *)[_view viewWithTag:btnTag];
+                btn.frame = CGRectMake((btnTag - kDirectPacTag) * 105, 0, 105, 44);
             }
         }
     }
 }
 
-- (void)viewDidDisappear
+
+- (void)viewWillDisappear
 {
-    if (isContentShowing)
-    {
-        [self pacViewerTapped:viewer];
-    }
+    [viewer dismissAnimated:NO];
 }
 
 - (void)initButtonStatus
@@ -156,19 +154,13 @@
     PAC_TYPE pacType = [self currentPacType];
     NSUInteger currentPacButtonTag = kDirectPacTag + pacType;
     
-    UIButton *currentPacButton = (UIButton *)[self.view viewWithTag:currentPacButtonTag];
+    UIButton *currentPacButton = (UIButton *)[_view viewWithTag:currentPacButtonTag];
     [currentPacButton setTitle:[@"· " stringByAppendingString:currentPacButton.titleLabel.text] forState:UIControlStateNormal];
     currentPacButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
 }
 
 - (void)switchProxy:(UIButton *)sender
 {
-    if (isContentShowing)
-    {
-        [self pacViewerTapped:viewer];
-        return;
-    }
-    
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *pacToSwitchTo = [pacArray objectAtIndex:(sender.tag - kDirectPacTag)];
     NSError *error = nil;
@@ -178,6 +170,23 @@
         NSString *pacString = [NSString stringWithContentsOfFile:pacToSwitchTo encoding:NSUTF8StringEncoding error:&error];
         if (!error && [pacString length])
         {
+            if (isContentShowing && viewer)
+            {
+                [UIView animateWithDuration:0.2 animations:^{
+                    viewer.textView.alpha = 0;
+                } completion:^(BOOL finished){
+                    if (finished)
+                    {
+                        viewer.textView.text = pacString;
+                        [UIView animateWithDuration:0.2 animations:^{
+                            viewer.textView.alpha = 1;
+                        }];
+                    }
+                }];
+                
+                return;
+            }
+            
             error = nil;
             BOOL result = [pacString writeToFile:kCurrentPacPath atomically:NO encoding:NSUTF8StringEncoding error:&error];
             if (result)
@@ -197,11 +206,13 @@
             NSLog(@"error: %@", [error description]);
         }
     }
+    
+
 }
 
 - (void)changeButtonStatusIfSucceed:(BOOL)isSucceed selectedButtonTag:(NSUInteger)btnTag
 {
-    UIButton *selectedBtn = (UIButton *)[self.view viewWithTag:btnTag];
+    UIButton *selectedBtn = (UIButton *)[_view viewWithTag:btnTag];
     if (selectedBtn.titleLabel.font == [UIFont boldSystemFontOfSize:16])
     {
         return;
@@ -241,7 +252,7 @@
                         origMessage = @"";
                         break;
                 }
-                UIButton *btn = (UIButton *)[self.view viewWithTag:tag];
+                UIButton *btn = (UIButton *)[_view viewWithTag:tag];
                 [btn setTitle:origMessage forState:UIControlStateNormal];
                 btn.titleLabel.font = [UIFont systemFontOfSize:16];
             }
@@ -281,7 +292,6 @@
         isContentShowing = YES;
         
         UIButton *button = (UIButton *)gesture.view;
-        button.selected = YES;
         
         NSString *pacPath = nil;
         switch (button.tag)
@@ -302,51 +312,30 @@
         
         UITableView *NCTableView = (UITableView *)_view.superview.superview.superview;
         
+        NSLog(@"NCTableView Delegate : %@", NCTableView.delegate);
         NSLog(@"NCTableView.superview : %@", _view.superview.superview.superview.superview);
         NSLog(@"NCTableView.superview.superview : %@", _view.superview.superview.superview.superview.superview);
-        NSLog(@"NCTableView.superview.superview.superview : %@", _view.superview.superview.superview.superview.superview.superview);
+        NSLog(@"rootWindow : %@", _view.superview.superview.superview.superview.superview.superview);
         
-        CGFloat origY = [_view convertPoint:CGPointMake(0, 35) toView:(UIView *)NCTableView].y;
-        CGFloat height = 440 - origY;
+//        UIWindow *rootWindow = (UIWindow *)_view.superview.superview.superview.superview.superview.superview;
+        CGFloat origY = [_view convertPoint:CGPointMake(0, 44) toView:(UIView *)NCTableView].y;
+        CGFloat height = 430 - origY;
 
         NSError *error = nil;
         NSString *pacStr = [NSString stringWithContentsOfFile:pacPath encoding:NSUTF8StringEncoding error:&error];
-        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(0, 20, 320, 244)];
+        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(2, origY, 316, height)];
         viewer.delegate = self;
         viewer.textView.text = pacStr;
-//        [(UIView *)NCTableView addSubview:viewer];
-        UIWindow *rootWindow = (UIWindow *)_view.superview.superview.superview.superview.superview.superview;
-        [rootWindow addSubview:viewer];
+
+        [NCTableView addSubview:viewer];
         
         [viewer release];
     }
 }
 
-- (void)pacViewerTapped:(PacViewer *)pacViewer
+- (void)pacViewerWillDismiss
 {
-    [UIView animateWithDuration:0.3f animations:^{
-        pacViewer.textView.alpha = 0;
-        pacViewer.textView.frame = CGRectMake(2, 0, 316, 0);
-    } completion:^(BOOL finished){
-        if (finished)
-        {
-            [pacViewer removeFromSuperview];
-        }
-    }];
-    
-    for (int tag = kDirectPacTag; tag <= kProxyAllPacTag; tag++)
-    {
-        @autoreleasepool
-        {
-            UIButton *btn = (UIButton *)[self.view viewWithTag:tag];
-            if (btn.selected)
-            {
-                btn.selected = NO;
-                break;
-            }
-        }
-    }
-    
+    viewer = nil;
     isContentShowing = NO;
 }
 
