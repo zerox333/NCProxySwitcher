@@ -86,16 +86,7 @@
     [buttonsView addSubview:saveBtn];
     [saveBtn release];
     
-    UIButton *closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(kPacViewerSize.width / 3, 0, kPacViewerSize.width / 3, 35)];
-    closeBtn.tag = kCloseBtnTag;
-    closeBtn.titleLabel.font = [UIFont systemFontOfSize:16];
-    [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [closeBtn setTitle:@"Close" forState:UIControlStateNormal];
-    [closeBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
-    [buttonsView addSubview:closeBtn];
-    [closeBtn release];
-    
-    UIButton *saveAndSwitchBtn = [[UIButton alloc] initWithFrame:CGRectMake(2 * kPacViewerSize.width / 3, 0, kPacViewerSize.width / 3, 35)];
+    UIButton *saveAndSwitchBtn = [[UIButton alloc] initWithFrame:CGRectMake(kPacViewerSize.width / 3, 0, kPacViewerSize.width / 3, 35)];
     saveAndSwitchBtn.tag = kSaveAndSwitchBtnTag;
     saveAndSwitchBtn.titleLabel.font = [UIFont systemFontOfSize:16];
     [saveAndSwitchBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -104,6 +95,15 @@
     [buttonsView addSubview:saveAndSwitchBtn];
     [saveAndSwitchBtn release];
     
+    UIButton *closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(2 * kPacViewerSize.width / 3, 0, kPacViewerSize.width / 3, 35)];
+    closeBtn.tag = kCloseBtnTag;
+    closeBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [closeBtn setTitle:@"Close" forState:UIControlStateNormal];
+    [closeBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+    [buttonsView addSubview:closeBtn];
+    [closeBtn release];
+ 
     [self addSubview:buttonsView];
 }
 

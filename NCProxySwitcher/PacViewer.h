@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 #define kSaveBtnTag             2001
-#define kCloseBtnTag            2002
-#define kSaveAndSwitchBtnTag    2003
+#define kSaveAndSwitchBtnTag    2002
+#define kCloseBtnTag            2003
 
 @class PacViewer;
 
