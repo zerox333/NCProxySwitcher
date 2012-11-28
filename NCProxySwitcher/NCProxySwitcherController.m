@@ -19,11 +19,16 @@
 #define kProxyAutoPacPath   @"/var/mobile/PAC/Proxy_ignoreLocal.pac"
 #define kProxyAllPacPath    @"/var/mobile/PAC/Proxy_all.pac"
 
+#define kMobilePacDir          @"/var/mobile/PAC/"
+#define kDocumentsPacDir       @"/var/mobile/Documents/OriginalPACs/"
+
 @implementation NCProxySwitcherController
 @synthesize pacArray;
 
 - (id)init
 {
+    [self copyOriginalPacsToMobilePacDirIfNeeded];
+    
 	if ((self = [super init]))
 	{
         self.pacArray = [NSArray arrayWithObjects:kDirectPacPath, kProxyAutoPacPath, kProxyAllPacPath, nil];
@@ -31,6 +36,40 @@
 	}
     
 	return self;
+}
+
+- (void)copyOriginalPacsToMobilePacDirIfNeeded
+{
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    NSError *creatDirError = nil;
+    if (![fm createDirectoryAtPath:kMobilePacDir withIntermediateDirectories:NO attributes:nil error:&creatDirError])
+    {
+        NSLog(@"Creat Mobile PAC Dir Error: %@", creatDirError);
+    }
+    else
+    {
+        NSLog(@"Created Mobile PAC Dir Successfully");
+    }
+    
+    for (NSString *path in [fm subpathsAtPath:kDocumentsPacDir])
+    {
+        if (![fm fileExistsAtPath:[kMobilePacDir stringByAppendingString:path]])
+        {
+            NSError *error = nil;
+            NSString *pacStr = [NSString stringWithContentsOfFile:[kDocumentsPacDir stringByAppendingString:path] encoding:NSUTF8StringEncoding error:&error];
+            NSError *writeError = nil;
+            [pacStr writeToFile:[kMobilePacDir stringByAppendingString:path] atomically:NO encoding:NSUTF8StringEncoding error:&writeError];
+            if (writeError)
+            {
+                NSLog(@"Write Error: %@", writeError);
+            }
+        }
+        else
+        {
+            NSLog(@"%@ Exists", [kMobilePacDir stringByAppendingString:path]);
+        }
+    }
 }
 
 - (void)dealloc
@@ -314,7 +353,7 @@
         UITableView *NCTableView = (UITableView *)_view.superview.superview.superview;
         
         NSLog(@"NCTableView Delegate : %@", NCTableView.delegate);
-        NSLog(@"NCTableView.superview : %@", _view.superview.superview.superview.superview);
+        NSLog(@"NCView : %@", _view.superview.superview.superview.superview);
         NSLog(@"NCTableView.superview.superview : %@", _view.superview.superview.superview.superview.superview);
         NSLog(@"rootWindow : %@", _view.superview.superview.superview.superview.superview.superview);
         
