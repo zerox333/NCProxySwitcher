@@ -211,6 +211,22 @@
     {
         if (isContentShowing && viewer)
         {
+            for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
+            {
+                @autoreleasepool
+                {
+                    UIButton *btn = (UIButton *)[_view viewWithTag:btnTag];
+                    if (btnTag == sender.tag)
+                    {
+                        [btn setTitleColor:[UIColor colorWithRed:0.25 green:0.65 blue:0.92 alpha:1] forState:UIControlStateNormal];
+                    }
+                    else
+                    {
+                        [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+                    }
+                }
+            }
+            
             [UIView animateWithDuration:0.2 animations:^{
                 viewer.textView.alpha = 0;
             } completion:^(BOOL finished){
@@ -345,6 +361,8 @@
         
         UIButton *button = (UIButton *)gesture.view;
         
+        [button setTitleColor:[UIColor colorWithRed:0.25 green:0.65 blue:0.92 alpha:1] forState:UIControlStateNormal];
+        
         NSString *pacPath = nil;
         switch (button.tag)
         {
@@ -370,12 +388,12 @@
         NSLog(@"rootWindow : %@", _view.superview.superview.superview.superview.superview.superview);
         
         UIWindow *NCView = (UIWindow *)_view.superview.superview.superview.superview;
-        CGFloat origY = [_view convertPoint:CGPointMake(0, 44) toView:(UIView *)NCView].y;
-        CGFloat height = 450 - origY;
+        CGFloat origY = [_view convertPoint:CGPointMake(0, _view.bounds.size.height) toView:(UIView *)NCView].y;
+        CGFloat height = (_view.bounds.size.height == 44) ? (450 - origY) : (320 - origY);
 
         NSError *error = nil;
         NSString *pacStr = [NSString stringWithContentsOfFile:pacPath encoding:NSUTF8StringEncoding error:&error];
-        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(2, origY, 316, height)];
+        viewer = [[PacViewer alloc] initWithFrame:CGRectMake(2, origY, _view.bounds.size.width, height)];
         viewer.delegate = self;
         viewer.textView.text = pacStr;
 
@@ -422,6 +440,15 @@
             }
             
             [self changeButtonStatusIfSucceed:YES selectedButtonTag:tag];
+        }
+    }
+    
+    for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
+    {
+        @autoreleasepool
+        {
+            UIButton *btn = (UIButton *)[_view viewWithTag:btnTag];
+            [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         }
     }
     

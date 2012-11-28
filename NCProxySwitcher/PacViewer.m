@@ -9,7 +9,8 @@
 #import "PacViewer.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define kPacViewerRectEditing   CGRectMake(self.frame.origin.x, 20, self.frame.size.width, 244)
+#define kPacViewerRectEditingPortrait   CGRectMake(self.frame.origin.x, 20, self.frame.size.width, 244)
+#define kPacViewerRectEditingLandscape  CGRectMake(self.frame.origin.x, 20, self.frame.size.width, 138)
 
 #define kPacViewerSize          self.bounds.size
 
@@ -131,6 +132,8 @@
     BOOL save = (btnTag == kSaveBtnTag || btnTag == kSaveAndSwitchBtnTag);
     BOOL switchTo = (btnTag == kSaveAndSwitchBtnTag);
     
+    [delegate pacViewerWillDismissWithPacFileSaved:save switchTo:switchTo];
+    
     if (animated)
     {
         [UIView animateWithDuration:0.15f animations:^{
@@ -147,7 +150,6 @@
                     bgView.alpha = 0;
                     bgView.frame = CGRectMake(0, 0, kPacViewerSize.width, 0);
                 } completion:^(BOOL finished){
-                    [delegate pacViewerWillDismissWithPacFileSaved:save switchTo:switchTo];
                     [self removeFromSuperview];
                 }];
             }
@@ -155,7 +157,6 @@
     }
     else
     {
-        [delegate pacViewerWillDismissWithPacFileSaved:save switchTo:switchTo];
         [self removeFromSuperview];
     }
 }
@@ -164,7 +165,7 @@
 {
     self.userInteractionEnabled = NO;
     [UIView animateWithDuration:0.3f animations:^{
-        self.frame = kPacViewerRectEditing;
+        self.frame = self.frame.size.width > 320 ? kPacViewerRectEditingLandscape : kPacViewerRectEditingPortrait;
         self.textView.frame = kTextViewRect;
         bgView.frame = kBgViewRect;
         buttonsView.frame = kButtonsViewRect;
