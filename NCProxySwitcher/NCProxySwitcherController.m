@@ -9,6 +9,7 @@
 #import "NCProxySwitcherController.h"
 #import <SBBulletinTableView.h>
 
+#define kBgViewTag          999
 #define kDirectPacTag       1001
 #define kProxyAutoPacTag    1002
 #define kProxyAllPacTag     1003
@@ -50,7 +51,7 @@
 		UIImage *bg = [[UIImage imageWithContentsOfFile:@"/System/Library/WeeAppPlugins/NCProxySwitcher.bundle/WeeAppBackground.png"] stretchableImageWithLeftCapWidth:5 topCapHeight:70];
 		UIImageView *bgView = [[UIImageView alloc] initWithImage:bg];
 		bgView.frame = CGRectMake(0, 0, 316, 44);
-        bgView.tag = 999;
+        bgView.tag = kBgViewTag;
 		[_view addSubview:bgView];
 		[bgView release];
         
@@ -115,7 +116,7 @@
     {
         NSLog(@"Landscape====================");
         _view.frame = CGRectMake(2, 0, 476, 35);
-        UIImageView *bgView = (UIImageView *)[_view viewWithTag:999];
+        UIImageView *bgView = (UIImageView *)[_view viewWithTag:kBgViewTag];
         bgView.frame = CGRectMake(0, 0, 476, 35);
         for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
         {
@@ -130,7 +131,7 @@
     {
         NSLog(@"Portrait====================");
         _view.frame = CGRectMake(2, 0, 316, 44);
-        UIImageView *bgView = (UIImageView *)[_view viewWithTag:999];
+        UIImageView *bgView = (UIImageView *)[_view viewWithTag:kBgViewTag];
         bgView.frame = CGRectMake(0, 0, 316, 44);
         for (int btnTag = kDirectPacTag; btnTag <= kProxyAllPacTag; btnTag++)
         {
@@ -262,7 +263,7 @@
 
 - (PAC_TYPE)currentPacType
 {
-    PAC_TYPE pacType;
+    PAC_TYPE pacType = 0;
     NSFileManager *fm = [NSFileManager defaultManager];
     if ([fm fileExistsAtPath:kCurrentPacPath])
     {
@@ -328,7 +329,6 @@
         viewer.textView.text = pacStr;
 
         [NCView addSubview:viewer];
-        [NCView bringSubviewToFront:viewer];
         
         [viewer release];
     }
