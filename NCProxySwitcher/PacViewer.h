@@ -24,9 +24,9 @@
 
 @interface PacViewer : UIView <UITextViewDelegate>
 {
-    UIView *bgView;
-    UITextView *textView;
-    UIView *buttonsView;
+    UIView *bgView;                 //背景
+    UITextView *textView;           //文本框
+    UIView *buttonsView;            //按钮栏
     id<PacViewerDelegate> delegate;
 }
 
