@@ -23,6 +23,7 @@ typedef enum{
     NSArray *pacArray;
     BOOL isContentShowing;
     PacViewer *viewer;
+    NSString *editingPacPath;
 }
 
 @property(nonatomic, retain) NSArray *pacArray;

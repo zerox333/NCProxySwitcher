@@ -14,13 +14,13 @@
 #define kPacViewerSize          self.bounds.size
 
 #define kTextViewRect           CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height - 35)
-#define kCloseBtnRect           CGRectMake(0, self.bounds.size.height - 35, self.bounds.size.width, 35)
+#define kButtonsViewRect        CGRectMake(0, self.bounds.size.height - 35, self.bounds.size.width, 35)
 #define kBgViewRect             CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height - 35)
 
 @implementation PacViewer
 @synthesize bgView;
 @synthesize textView;
-@synthesize closeBtn;
+@synthesize buttonsView;
 @synthesize delegate;
 
 - (id)initWithFrame:(CGRect)frame
@@ -31,6 +31,8 @@
         self.layer.masksToBounds = YES;
         self.clipsToBounds = YES;
         self.autoresizesSubviews = YES;
+        
+        [self initButtonsViewWitchFrame:CGRectMake(0, kPacViewerSize.height - 35, kPacViewerSize.width, 0)];
         
         textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, kPacViewerSize.width, 0)];
         textView.delegate = self;
@@ -46,16 +48,7 @@
 //        textView.layer.shadowColor = [UIColor blackColor].CGColor;
   
         [self addSubview:textView];
-        
-        closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, kPacViewerSize.height - 35, kPacViewerSize.width, 0)];
-        closeBtn.alpha = 0;
-        closeBtn.backgroundColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.8];
-        closeBtn.titleLabel.font = [UIFont systemFontOfSize:16];
-        [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [closeBtn setTitle:@"Close" forState:UIControlStateNormal];
-        [closeBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:closeBtn];
-        
+       
         bgView = [[UIView alloc] initWithFrame:kBgViewRect];
         bgView.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
         
@@ -67,8 +60,8 @@
             {
                 [self insertSubview:bgView atIndex:0];
                 [UIView animateWithDuration:0.3f animations:^{
-                    closeBtn.alpha = 1;
-                    closeBtn.frame = kCloseBtnRect;
+                    buttonsView.alpha = 1;
+                    buttonsView.frame = kButtonsViewRect;
                 }];
             }
         }];
@@ -77,20 +70,56 @@
     return self;
 }
 
+- (void)initButtonsViewWitchFrame:(CGRect)frame
+{
+    buttonsView = [[UIView alloc] initWithFrame:frame];
+    buttonsView.backgroundColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.8];
+    buttonsView.alpha = 0;
+    
+    UIButton *saveBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, kPacViewerSize.width / 3, 35)];
+    saveBtn.tag = kSaveBtnTag;
+    saveBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    [saveBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [saveBtn setTitle:@"Save" forState:UIControlStateNormal];
+    [saveBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+    [buttonsView addSubview:saveBtn];
+    [saveBtn release];
+    
+    UIButton *closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(kPacViewerSize.width / 3, 0, kPacViewerSize.width / 3, 35)];
+    closeBtn.tag = kCloseBtnTag;
+    closeBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [closeBtn setTitle:@"Close" forState:UIControlStateNormal];
+    [closeBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+    [buttonsView addSubview:closeBtn];
+    [closeBtn release];
+    
+    UIButton *saveAndSwitchBtn = [[UIButton alloc] initWithFrame:CGRectMake(2 * kPacViewerSize.width / 3, 0, kPacViewerSize.width / 3, 35)];
+    saveAndSwitchBtn.tag = kSaveAndSwitchBtnTag;
+    saveAndSwitchBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    [saveAndSwitchBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [saveAndSwitchBtn setTitle:@"Save&Switch" forState:UIControlStateNormal];
+    [saveAndSwitchBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+    [buttonsView addSubview:saveAndSwitchBtn];
+    [saveAndSwitchBtn release];
+    
+    [self addSubview:buttonsView];
+}
+
 - (void)dealloc
 {
     [bgView release];
     [textView release];
-    [closeBtn release];
+    [buttonsView release];
     [super dealloc];
 }
 
 - (void)close:(UIButton *)sender
 {
-    [self dismissAnimated:YES];
+    [self dismissAnimated:YES btnTag:sender.tag];
 }
 
-- (void)dismissAnimated:(BOOL)animated
+- (void)dismissAnimated:(BOOL)animated btnTag:(NSInteger)btnTag
 {
     if ([textView isFirstResponder])
     {
@@ -99,13 +128,16 @@
     
     NSLog(@"dissmissing.......");
     
+    BOOL save = (btnTag == kSaveBtnTag || btnTag == kSaveAndSwitchBtnTag);
+    BOOL switchTo = (btnTag == kSaveAndSwitchBtnTag);
+    
     if (animated)
     {
         [UIView animateWithDuration:0.15f animations:^{
-            CGRect closeBtnRect = closeBtn.frame;
-            closeBtnRect.size.height -= 35;
-            closeBtn.alpha = 0;
-            closeBtn.frame = closeBtnRect;
+            CGRect buttonsViewRect = buttonsView.frame;
+            buttonsViewRect.size.height -= 35;
+            buttonsView.alpha = 0;
+            buttonsView.frame = buttonsViewRect;
         } completion:^(BOOL finished){
             if (finished)
             {
@@ -115,7 +147,7 @@
                     bgView.alpha = 0;
                     bgView.frame = CGRectMake(0, 0, kPacViewerSize.width, 0);
                 } completion:^(BOOL finished){
-                    [delegate pacViewerWillDismiss];
+                    [delegate pacViewerWillDismissWithPacFileSaved:save switchTo:switchTo];
                     [self removeFromSuperview];
                 }];
             }
@@ -123,7 +155,7 @@
     }
     else
     {
-        [delegate pacViewerWillDismiss];
+        [delegate pacViewerWillDismissWithPacFileSaved:save switchTo:switchTo];
         [self removeFromSuperview];
     }
 }
@@ -135,7 +167,7 @@
         self.frame = kPacViewerRectEditing;
         self.textView.frame = kTextViewRect;
         bgView.frame = kBgViewRect;
-        closeBtn.frame = kCloseBtnRect;
+        buttonsView.frame = kButtonsViewRect;
     } completion:^(BOOL finished){
         if (finished)
         {

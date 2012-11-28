@@ -8,13 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
+#define kSaveBtnTag             2001
+#define kCloseBtnTag            2002
+#define kSaveAndSwitchBtnTag    2003
+
 @class PacViewer;
 
 @protocol PacViewerDelegate <NSObject>
 
 @optional
 
-- (void)pacViewerWillDismiss;
+- (void)pacViewerWillDismissWithPacFileSaved:(BOOL)save switchTo:(BOOL)switchToPac;
 
 @end
 
@@ -22,15 +26,15 @@
 {
     UIView *bgView;
     UITextView *textView;
-    UIButton *closeBtn;
+    UIView *buttonsView;
     id<PacViewerDelegate> delegate;
 }
 
 @property(nonatomic, retain) UIView *bgView;
 @property(nonatomic, retain) UITextView *textView;
-@property(nonatomic, retain) UIButton *closeBtn;
+@property(nonatomic, retain) UIView *buttonsView;
 @property(nonatomic, assign) id<PacViewerDelegate> delegate;
 
-- (void)dismissAnimated:(BOOL)animated;
+- (void)dismissAnimated:(BOOL)animated btnTag:(NSInteger)btnTag;
 
 @end

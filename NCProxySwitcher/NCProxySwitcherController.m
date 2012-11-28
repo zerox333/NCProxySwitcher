@@ -33,6 +33,7 @@
 	{
         self.pacArray = [NSArray arrayWithObjects:kDirectPacPath, kProxyAutoPacPath, kProxyAllPacPath, nil];
         isContentShowing = NO;
+        editingPacPath = nil;
 	}
     
 	return self;
@@ -186,13 +187,13 @@
 
 - (void)viewWillDisappear
 {
-    [viewer dismissAnimated:NO];
+    [viewer dismissAnimated:NO btnTag:kCloseBtnTag];
 }
 
 - (void)initButtonStatus
 {
     PAC_TYPE pacType = [self currentPacType];
-    NSUInteger currentPacButtonTag = kDirectPacTag + pacType;
+    NSInteger currentPacButtonTag = kDirectPacTag + pacType;
     
     UIButton *currentPacButton = (UIButton *)[_view viewWithTag:currentPacButtonTag];
     [currentPacButton setTitle:[@"· " stringByAppendingString:currentPacButton.titleLabel.text] forState:UIControlStateNormal];
@@ -201,56 +202,67 @@
 
 - (void)switchProxy:(UIButton *)sender
 {
-    NSFileManager *fm = [NSFileManager defaultManager];
     NSString *pacToSwitchTo = [pacArray objectAtIndex:(sender.tag - kDirectPacTag)];
     NSError *error = nil;
+    NSString *pacString = [NSString stringWithContentsOfFile:pacToSwitchTo encoding:NSUTF8StringEncoding error:&error];
     
-    if ([fm fileExistsAtPath:kCurrentPacPath] && [fm fileExistsAtPath:pacToSwitchTo])
+    //编辑模式切换PAC
+    if (!error && [pacString length])
     {
-        NSString *pacString = [NSString stringWithContentsOfFile:pacToSwitchTo encoding:NSUTF8StringEncoding error:&error];
-        if (!error && [pacString length])
+        if (isContentShowing && viewer)
         {
-            if (isContentShowing && viewer)
-            {
-                [UIView animateWithDuration:0.2 animations:^{
-                    viewer.textView.alpha = 0;
-                } completion:^(BOOL finished){
-                    if (finished)
-                    {
-                        viewer.textView.text = pacString;
-                        [UIView animateWithDuration:0.2 animations:^{
-                            viewer.textView.alpha = 1;
-                        }];
-                    }
-                }];
-                
-                return;
-            }
+            [UIView animateWithDuration:0.2 animations:^{
+                viewer.textView.alpha = 0;
+            } completion:^(BOOL finished){
+                if (finished)
+                {
+                    viewer.textView.text = pacString;
+                    [UIView animateWithDuration:0.2 animations:^{
+                        viewer.textView.alpha = 1;
+                    }];
+                    editingPacPath = pacToSwitchTo;
+                }
+            }];
             
-            error = nil;
-            BOOL result = [pacString writeToFile:kCurrentPacPath atomically:NO encoding:NSUTF8StringEncoding error:&error];
-            if (result)
-            {
-                NSLog(@"Write Successfully");
-                [self changeButtonStatusIfSucceed:YES selectedButtonTag:sender.tag];
-            }
-            else
-            {
-                //[self changeButtonStatusIfSucceed:NO selectedButtonTag:sender.tag];
-                NSLog(@"error: %@", [error description]);
-            }
-        }
-        else
-        {
-            //[self changeButtonStatusIfSucceed:NO selectedButtonTag:sender.tag];
-            NSLog(@"error: %@", [error description]);
+            return;
         }
     }
     
-
+    BOOL result = [self switchToProxy:pacToSwitchTo];
+    if (result)
+    {
+        NSLog(@"Switch Proxy Successfully");
+        [self changeButtonStatusIfSucceed:YES selectedButtonTag:sender.tag];
+    }
+    else
+    {
+        //[self changeButtonStatusIfSucceed:NO selectedButtonTag:sender.tag];
+        NSLog(@"error: %@", [error description]);
+    }
 }
 
-- (void)changeButtonStatusIfSucceed:(BOOL)isSucceed selectedButtonTag:(NSUInteger)btnTag
+- (BOOL)switchToProxy:(NSString *)pacPath
+{
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSError *error = nil;
+    if ([fm fileExistsAtPath:kCurrentPacPath] && [fm fileExistsAtPath:pacPath])
+    {
+        NSString *pacString = [NSString stringWithContentsOfFile:pacPath encoding:NSUTF8StringEncoding error:&error];
+        if (!error && [pacString length])
+        {
+            error = nil;
+            BOOL result = [pacString writeToFile:kCurrentPacPath atomically:NO encoding:NSUTF8StringEncoding error:&error];
+            if (!result)
+            {
+                NSLog(@"Switch Proxy Error: %@", error);
+            }
+            return result;
+        }
+    }
+    return NO;
+}
+
+- (void)changeButtonStatusIfSucceed:(BOOL)isSucceed selectedButtonTag:(NSInteger)btnTag
 {
     UIButton *selectedBtn = (UIButton *)[_view viewWithTag:btnTag];
     if (selectedBtn.titleLabel.font == [UIFont boldSystemFontOfSize:16])
@@ -370,13 +382,52 @@
         [NCView addSubview:viewer];
         
         [viewer release];
+        
+        editingPacPath = pacPath;
     }
 }
 
-- (void)pacViewerWillDismiss
+- (void)pacViewerWillDismissWithPacFileSaved:(BOOL)save switchTo:(BOOL)switchToPac
 {
+    if (save)
+    {
+        NSError *writeError = nil;
+        [viewer.textView.text writeToFile:editingPacPath atomically:NO encoding:NSUTF8StringEncoding error:&writeError];
+        if (writeError)
+        {
+            NSLog(@"Save pacViewer Error: %@", writeError);
+        }
+    }
+    
+    if (switchToPac)
+    {
+        BOOL result = [self switchToProxy:editingPacPath];
+        if (result)
+        {
+            NSLog(@"Switch Proxy Successfully");
+            
+            NSInteger tag = 0;
+            NSString *pacName = [editingPacPath lastPathComponent];
+            if ([pacName isEqualToString:@"Proxy_ignoreLocal.pac"])
+            {
+                tag = kProxyAutoPacTag;
+            }
+            else if ([pacName isEqualToString:@"Proxy_all.pac"])
+            {
+                tag = kProxyAllPacTag;
+            }
+            else
+            {
+                tag = kDirectPacTag;
+            }
+            
+            [self changeButtonStatusIfSucceed:YES selectedButtonTag:tag];
+        }
+    }
+    
     viewer = nil;
     isContentShowing = NO;
+    editingPacPath = nil;
 }
 
 @end
